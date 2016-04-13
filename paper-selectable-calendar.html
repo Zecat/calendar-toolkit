@@ -55,7 +55,7 @@ Example:
               <div style$="width: calc(14.285% * [[month.startWeekday]])"></div>
               <template is="dom-repeat" items="[[month.days]]" as="day">
                 <div class$="dayWrapper{{_getSelectedClass(day.selected)}}">
-                  <div class="day">[[day.date]]</div>
+                  <div class="day">{{_increment(index)}}</div>
                 </div>
               </template>
             </div>
@@ -139,8 +139,8 @@ Example:
         var days = [];
         for(let i=0; i<month.daysInMonth(); i++) {
           days[i] = {
-            date: i+1,
-            selected: false
+            selected: false,
+            timestamp: month.date(i+1).valueOf()
           };
         }
         return days;
@@ -148,6 +148,10 @@ Example:
 
       _getSelectedClass: function(selected) {
         return selected ? ' selected': '';
+      },
+
+      _increment: function(n) {
+        return n + 1;
       },
 
       _shouldCancelSelection: function(e) {
