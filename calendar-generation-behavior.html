@@ -36,6 +36,14 @@
             return moment();
           }
         },
+        _firstLoadedMonthDate: {
+          type: Date,
+          readOnly: true
+        },
+        _lastLoadedMonthDate: {
+          type: Date,
+          readOnly: true
+        },
         _unloadedLowerMonths: {
           type: Number,
           readOnly: true
@@ -71,11 +79,10 @@
       },
 
       generateLowerMonths: function(nb) {
-        var lastMonth = this._months[this._months.length - 1];
-        if (!lastMonth || !this._unloadedLowerMonths || nb <= 0) {
+        if (!this._lastLoadedMonthDate || !this._unloadedLowerMonths || nb <= 0) {
           return;
         }
-        var month = moment([lastMonth.year, lastMonth.month]);
+        var month = moment(this._lastLoadedMonthDate);
         if (this._unloadedLowerMonths > -1) {
           nb = Math.min(nb, this._unloadedLowerMonths);
           this._set_unloadedLowerMonths(this._unloadedLowerMonths - nb);
@@ -84,15 +91,15 @@
           month.add(1, 'month');
           this.push('_months', this._getMonth(month));
         }
+        this._set_lastLoadedMonthDate(month.toDate());
         this.$.scrollThreshold.clearTriggers();
       },
 
       generateUpperMonths: function(nb) {
-        var firstMonth = this._months[0];
-        if (!firstMonth || !this._unloadedUpperMonths || nb <= 0) {
+        if (!this._firstLoadedMonthDate || !this._unloadedUpperMonths || nb <= 0) {
           return;
         }
-        var month = moment([firstMonth.year, firstMonth.month]);
+        var month = moment(this._firstLoadedMonthDate);
         if (this._unloadedUpperMonths > -1) {
           nb = Math.min(nb, this._unloadedUpperMonths);
           this._set_unloadedUpperMonths(this._unloadedUpperMonths - nb)
@@ -104,6 +111,7 @@
         var savedScrollTop = this.$.scrollThreshold.scrollTop;
         this.$.ironList.scrollToIndex(nb);
         this.$.scrollThreshold.scroll(0, this.$.scrollThreshold.scrollTop + savedScrollTop);
+        this._set_firstLoadedMonthDate(month.toDate());
         this.$.scrollThreshold.clearTriggers();
       },
 
@@ -116,6 +124,8 @@
           month = moment.min(month, moment(this.maxMonth));
         }
         this._months = [ this._getMonth( moment(month) ) ];
+        this._set_firstLoadedMonthDate(month.startOf('month').toDate());
+        this._set_lastLoadedMonthDate(month.startOf('month').toDate());
         this._set_unloadedLowerMonths(this.maxMonth ? moment(this.maxMonth).diff(month, 'month') : -1);
         this._set_unloadedUpperMonths(this.minMonth ? moment(month).diff(this.minMonth, 'month') : -1);
         this._loadLowerMonth();
