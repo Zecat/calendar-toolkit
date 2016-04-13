@@ -37,10 +37,12 @@
           }
         },
         _unloadedLowerMonths: {
-          type: Number
+          type: Number,
+          readOnly: true
         },
         _unloadedUpperMonths: {
-          type: Number
+          type: Number,
+          readOnly: true
         },
         _months: {
           type: Array,
@@ -49,7 +51,8 @@
           }
         },
         _weekdays: {
-          type: Array
+          type: Array,
+          readOnly: true
         }
       },
 
@@ -75,7 +78,7 @@
         var month = moment([lastMonth.year, lastMonth.month]);
         if (this._unloadedLowerMonths > -1) {
           nb = Math.min(nb, this._unloadedLowerMonths);
-          this._unloadedLowerMonths -= nb;
+          this._set_unloadedLowerMonths(this._unloadedLowerMonths - nb);
         }
         for (let i=0; i<nb; i++) {
           month.add(1, 'month');
@@ -92,7 +95,7 @@
         var month = moment([firstMonth.year, firstMonth.month]);
         if (this._unloadedUpperMonths > -1) {
           nb = Math.min(nb, this._unloadedUpperMonths);
-          this._unloadedUpperMonths -= nb;
+          this._set_unloadedUpperMonths(this._unloadedUpperMonths - nb)
         }
         for (let i=0; i<nb; i++) {
           month.subtract(1, 'month');
@@ -113,8 +116,8 @@
           month = moment.min(month, moment(this.maxMonth));
         }
         this._months = [ this._getMonth( moment(month) ) ];
-        this._unloadedLowerMonths =  this.maxMonth ? moment(this.maxMonth).diff(month, 'month') : -1;
-        this._unloadedUpperMonths =  this.minMonth ? moment(month).diff(this.minMonth, 'month') : -1;
+        this._set_unloadedLowerMonths(this.maxMonth ? moment(this.maxMonth).diff(month, 'month') : -1);
+        this._set_unloadedUpperMonths(this.minMonth ? moment(month).diff(this.minMonth, 'month') : -1);
         this._loadLowerMonth();
       },
 
@@ -171,7 +174,7 @@
         for (var i=0; i<7; i++) {
           weekdays.push(moment().weekday(i).format('dd'));
         }
-        this._weekdays = weekdays;
+        this._set_weekdays(weekdays)
       },
 
       _getMonthName: function(monthIndex) {

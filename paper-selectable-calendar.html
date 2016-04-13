@@ -78,7 +78,8 @@ Example:
         selecting: {
           type: Boolean,
           value: false,
-          notify: true
+          notify: true,
+          readOnly: true
         },
         selectionDisabled : {
           type: Boolean,
@@ -156,7 +157,7 @@ Example:
       },
 
       _startSelection: function(e) {
-        this.selecting = true;
+        this._setSelecting(true);
         console.log('selection start');
       },
 
@@ -177,7 +178,7 @@ Example:
             break;
             case 'end':
               console.log('selection end');
-              this.selecting = false;
+              this._setSelecting(false);
           }
         }
       },
