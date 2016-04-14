@@ -78,6 +78,11 @@
         this.setScrollDirection('y', this.$.scrollThreshold);
       },
 
+      generateMonthsUntil: function(month) {
+        this.generateLowerMonths(moment(month).diff(this._lastLoadedMonthDate, 'month'));
+        this.generateUpperMonths(moment(this._firstLoadedMonthDate).diff(month, 'month'));
+      },
+
       generateLowerMonths: function(nb) {
         if (!this._lastLoadedMonthDate || !this._unloadedLowerMonths || nb <= 0) {
           return;
@@ -115,19 +120,24 @@
         this.$.scrollThreshold.clearTriggers();
       },
 
+      getMonthIndexForDate: function(date) {
+        return moment(date).diff(this._firstLoadedMonthDate, 'month');
+      },
+
       jumpToMonth: function(month) {
         // TODO: for performance, if month is already generated, use this.$.ironList.scrollToIndex()
+        var month = moment(month);
         if (this.minMonth != undefined) {
           month = moment.max(month, moment(this.minMonth));
         }
         if (this.maxMonth != undefined) {
           month = moment.min(month, moment(this.maxMonth));
         }
-        this._months = [ this._getMonth( moment(month) ) ];
+        this._months = [ this._getMonth(month) ];
         this._set_firstLoadedMonthDate(month.startOf('month').toDate());
         this._set_lastLoadedMonthDate(month.startOf('month').toDate());
         this._set_unloadedLowerMonths(this.maxMonth ? moment(this.maxMonth).diff(month, 'month') : -1);
-        this._set_unloadedUpperMonths(this.minMonth ? moment(month).diff(this.minMonth, 'month') : -1);
+        this._set_unloadedUpperMonths(this.minMonth ? month.diff(this.minMonth, 'month') : -1);
         this._loadLowerMonth();
       },
 
