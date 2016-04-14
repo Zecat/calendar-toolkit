@@ -55,7 +55,7 @@ Example:
               <div style$="width: calc(14.285% * [[month.startWeekday]])"></div>
               <template is="dom-repeat" items="[[month.days]]">
                 <div class="dayWrapper">
-                  <div class="day">[[item.date]]</div>
+                  <div class="day">{{_increment(index)}}</div>
                 </div>
               </template>
             </div>

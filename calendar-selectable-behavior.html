@@ -1,0 +1,237 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="moment-import.html">
+<link rel="import" href="calendar-properties-management-behavior.html">
+
+<script>
+  /**
+   * @demo demo/index.html
+   * @polymerBehavior Polymer.CalendarSelectableBehavior
+   */
+  Polymer.CalendarSelectableBehaviorImpl = {
+  	
+  	properties: {
+      immediateStartDate: {
+        type: Date,
+        computed: 'computeImmediateStartDate(_hoveredStartTimestamp, _hoveredTimestamp)',
+        notify: true
+      },
+      immediateEndDate: {
+        type: Date,
+        computed: 'computeImmediateEndDate(_hoveredStartTimestamp, _hoveredTimestamp)',
+        notify: true
+      },
+      selecting: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true,
+        observer: '_selectingChange'
+      },
+      selectionDisabled : {
+        type: Boolean,
+        value: false,
+        observer: '_selectionDisabledChange'
+      },
+      touchSelectionDelay: {
+        type: Number,
+        value: 500
+      },
+      touchSelectionMaxYTremor: {
+        type: Number,
+        value: 10
+      },
+      _hoveredStartTimestamp: {
+        type: Number,
+        readOnly: true
+      },
+      _hoveredTimestamp: {
+        type: Number,
+        computed: '_getTimestampFromTarget(_hoveredTarget)',
+        observer: '_hoveredTimestampChange'
+      },
+      _hoveredTarget: {
+        type: Object,
+        readOnly: true
+      },
+      _touching: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      },
+      _touchStartY: {
+        type: Number,
+        readOnly: true
+      },
+      _changedMonths: {
+        type: Array,
+        value: function() {
+          return []
+        }
+      }
+    },
+
+    observers: [
+      '_touchSelectingHandler(selecting, _touching)'
+    ],
+
+    _selectionDisabledChange: function(selectionDisabled) {
+      if (!selectionDisabled) {
+        this.listen(this, 'touchstart', '_touchStartHandler');
+        this.listen(this, 'touchend', '_touchEndHandler');
+        this.listen(this, 'mouseup', '_mouseupHandler');
+        this.listen(this, 'down', '_downHandler');
+        this.listen(this, 'track', '_trackHandler');
+      }
+      else {
+        this.unlisten(this, 'touchstart', '_touchStartHandler');
+        this.unlisten(this, 'touchend', '_touchEndHandler');
+        this.unlisten(this, 'mouseup', '_mouseupHandler');
+        this.unlisten(this, 'down', '_downHandler');
+        this.unlisten(this, 'track', '_trackHandler');
+        this._set_touching(false);
+        this._setSelecting(false);
+      }
+    },
+
+    _dayTapped: function(e) {
+      if (this._touching) {
+        this.togglePropertyFromModel(this._getModelFromDayTarget(e.target), 'selected');
+      }
+    },
+
+    _downHandler: function(e) {
+      if (this._touching && this.touchSelectionDelay) {
+        this._set_touchStartY(e.detail.y);
+        this.listen(this, 'touchmove', '_shouldCancelTouch');
+        this.async(function(){
+          this.unlisten(this, 'touchmove', '_shouldCancelTouch');
+          if (this._touching) {
+            this._startSelection(e);
+          }
+        }, this.touchSelectionDelay);
+      } else {
+        this._startSelection(e);
+      }
+    },
+
+    computeImmediateStartDate: function(_hoveredStartTimestamp, _hoveredTimestamp) {
+      console.log('start: '+moment(new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp))).format('L'));
+      return new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp));
+    },
+
+    computeImmediateEndDate: function(_hoveredStartTimestamp, _hoveredTimestamp) {
+      console.log('end: '+moment(new Date(Math.max(_hoveredStartTimestamp, _hoveredTimestamp))).format('L'));
+      return new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp));
+    },
+
+    _mouseupHandler: function() {
+      this._setSelecting(false);
+    },
+
+    _shouldCancelTouch: function(e) {
+      if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
+        this._set_touching(false);
+      }
+    },
+
+    _startSelection: function(e) {
+      this._setSelecting(true);
+      if (e.target.classList.contains('dayWrapper')) {
+        this._set_hoveredTarget(e.target);
+      }
+    },
+
+    _touchStartHandler: function(e) {
+      this._set_touching(true);
+    },
+
+    _touchEndHandler: function() {
+      this._set_touching(false);
+    },
+
+    _trackHandler: function(e) {
+      if (this.selecting) {
+        switch (e.detail.state) {
+          case 'track':
+            var hovered = e.detail.hover();
+            if (hovered && hovered.classList.contains('dayWrapper')) {
+              this._set_hoveredTarget(hovered);
+            }
+          break;
+          case 'end':
+            this._setSelecting(false);
+        }
+      }
+    },
+
+    _touchSelectingHandler: function(selecting, _touching) {
+      if (selecting) {
+        if (_touching) {
+          this.toggleClass('touch-selecting', true);
+        } else {
+          this.toggleClass('touch-selecting', false);
+        }
+      }
+    },
+
+    _getModelFromDayTarget: function(target) {
+      return Polymer.dom(Polymer.dom(target).parentNode).lastElementChild.modelForElement(target);
+    },
+
+    _getTimestampFromTarget: function(target) {
+      return target ? this._getModelFromDayTarget(target).__data__.day.timestamp : undefined;
+    },
+
+    _hoveredTimestampChange: function(_hoveredTimestamp, _previousHoveredTimestamp) {
+      if (_hoveredTimestamp == undefined) {
+        return;
+      }
+      if (_previousHoveredTimestamp == undefined) {
+        this.togglePropertyForDate(_hoveredTimestamp, 'selected');
+        this.togglePropertyForDate(_hoveredTimestamp, 'selecting');
+        this._set_hoveredStartTimestamp(_hoveredTimestamp);
+      } else {
+        var startDate = moment(_previousHoveredTimestamp);
+        var endDate = moment(_hoveredTimestamp);
+
+        if (_previousHoveredTimestamp >= this._hoveredStartTimestamp
+          && _hoveredTimestamp > this._hoveredStartTimestamp) {
+          if (_hoveredTimestamp > _previousHoveredTimestamp) {
+            startDate.add(1, 'day');
+          } else {
+            endDate.add(1, 'day');
+          }
+        } else if (_previousHoveredTimestamp <= this._hoveredStartTimestamp
+          && _hoveredTimestamp < this._hoveredStartTimestamp) {
+          if (_hoveredTimestamp < _previousHoveredTimestamp) {
+            startDate.subtract(1, 'day');
+          } else {
+            endDate.subtract(1, 'day');
+          }
+        }
+         if ( (Math.min(_previousHoveredTimestamp,_hoveredTimestamp) < this._hoveredStartTimestamp
+           && Math.max(_hoveredTimestamp, _previousHoveredTimestamp) > this._hoveredStartTimestamp) 
+           || (this._hoveredStartTimestamp == _hoveredTimestamp)) {
+          this.togglePropertyForDate(this._hoveredStartTimestamp, 'selected');
+          this.togglePropertyForDate(this._hoveredStartTimestamp, 'selecting');
+        }
+        this.togglePropertyForInterval(startDate, endDate, 'selected');
+        this.togglePropertyForInterval(startDate, endDate, 'selecting');
+      }
+    },
+
+    _selectingChange: function(selecting) {
+      if (!selecting) {
+        this.togglePropertyForInterval(this._hoveredStartTimestamp, this._hoveredTimestamp, 'selecting', false);
+        this._set_hoveredTarget(undefined);
+      }
+    },
+  };
+
+  /** @polymerBehavior */
+  Polymer.CalendarSelectableBehavior = [
+    Polymer.CalendarPropertiesManagementBehavior,
+    Polymer.CalendarSelectableBehaviorImpl
+  ];
+
+</script>

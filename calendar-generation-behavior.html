@@ -205,11 +205,16 @@
         var days = [];
         for(let i=0; i<month.daysInMonth(); i++) {
           days[i] = {
-            date: i+1
+            timestamp: month.date(i+1).valueOf()
           };
         }
         return days;
+      },
+
+      _increment: function(n) {
+        return n + 1;
       }
+
   }
 
 </script>

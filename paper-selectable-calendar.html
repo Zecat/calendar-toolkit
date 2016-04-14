@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="../paper-styles/color.html">
 <link rel="import" href="calendar-generation-behavior.html">
+<link rel="import" href="calendar-selectable-behavior.html">
 <link rel="import" href="paper-calendar-shared-styles.html">
 
 <!--
@@ -29,10 +30,20 @@ Example:
   <template>
     <style include="paper-calendar-shared-styles">
       .dayWrapper.selected {
-        background: var(--paper-blue-100);
+        background: var(--paper-blue-50);
       }
-      #scrollThreshold.touch-selecting {
+      .dayWrapper.selecting {
+        color: var(--paper-blue-800);
+      }
+      :host.touch-selecting #scrollThreshold {
         overflow: hidden !important;
+      }
+      .monthDays, .day {
+        pointer-events: none;
+      }
+      .dayWrapper {
+        pointer-events: all;
+        transition: background 0.5s, color 0.5s;
       }
     </style>
      <div class="week">
@@ -47,14 +58,14 @@ Example:
     upper-threshold="0"
     on-lower-threshold="_loadLowerMonth"
     on-upper-threshold="_loadUpperMonth">
-      <iron-list items="[[_months]]" as="month" id="ironList" scroll-target="scrollThreshold">
+      <iron-list items="[[_months]]" as="month" id="ironList" scroll-target="scrollThreshold" selected-items="{{_changedMonths}}">
         <template>
           <div class="month">
             <div class="month-name">[[_getMonthName(month.month)]] [[month.year]]</div>
-            <div class="monthDays">
-              <div style$="width: calc(14.285% * [[month.startWeekday]])"></div>
+            <div class="monthDays" on-tap="_dayTapped">
+              <div style$="pointer-events: none; width: calc(14.285% * [[month.startWeekday]])"></div>
               <template is="dom-repeat" items="[[month.days]]" as="day">
-                <div class$="dayWrapper{{_getSelectedClass(day.selected)}}">
+                <div class$="dayWrapper{{_getSelectedClass(day.selected)}}{{_getSelectingClass(day.selecting)}}">
                   <div class="day">{{_increment(index)}}</div>
                 </div>
               </template>
@@ -71,132 +82,17 @@ Example:
       is: 'paper-selectable-calendar',
 
       behaviors: [
-        Polymer.CalendarGenerationBehavior
+        Polymer.CalendarGenerationBehavior,
+        Polymer.CalendarSelectableBehavior
       ],
-
-      properties: {
-        selecting: {
-          type: Boolean,
-          value: false,
-          notify: true,
-          readOnly: true
-        },
-        selectionDisabled : {
-          type: Boolean,
-          value: false
-        },
-        touchSelectionDelay: {
-          type: Number,
-          value: 500
-        },
-        touchSelectionMaxYTremor: {
-          type: Number,
-          value: 10
-        },
-        _touching: {
-          type: Boolean,
-          value: false,
-          readOnly: true
-        },
-        _touchStartY: {
-          type: Number,
-          readOnly: true
-        }
-      },
-
-      observers: [
-        '_touchSelectingHandler(selecting, _touching)'
-      ],
-
-      listeners: {
-        'scrollThreshold.touchstart': '_touchStartHandler',
-        'scrollThreshold.touchend': '_touchEndHandler',
-        'scrollThreshold.down': '_downHandler',
-        'scrollThreshold.track': '_trackHandler'
-      },
-
-      _downHandler: function(e) {
-        if (this.selectionDisabled) {
-          return;
-        }
-        if (this._touching) {
-          this.selectionDisabled = true;
-          this._set_touchStartY(e.detail.y);
-          this.listen(this.$.scrollThreshold, 'touchmove', '_shouldCancelSelection');
-          this.async(function(){
-            this.unlisten(this.$.scrollThreshold, 'touchmove', '_shouldCancelSelection');
-            if (this._touching) {
-              this.selectionDisabled = false;
-              this._startSelection(e);
-            }
-          }, this.touchSelectionDelay);
-        } else {
-          this._startSelection(e);
-        }
-      },
-
-      _getMonthDays: function(month) {
-        var days = [];
-        for(let i=0; i<month.daysInMonth(); i++) {
-          days[i] = {
-            selected: false,
-            timestamp: month.date(i+1).valueOf()
-          };
-        }
-        return days;
-      },
 
       _getSelectedClass: function(selected) {
         return selected ? ' selected': '';
       },
 
-      _increment: function(n) {
-        return n + 1;
-      },
-
-      _shouldCancelSelection: function(e) {
-        if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
-          this._set_touching(false);
-        }
-      },
-
-      _startSelection: function(e) {
-        this._setSelecting(true);
-        console.log('selection start');
-      },
-
-      _touchStartHandler: function(e) {
-        this._set_touching(true);
-      },
-
-      _touchEndHandler: function() {
-        this._set_touching(false);
-        this.selectionDisabled = false;
-      },
-
-      _trackHandler: function(e) {
-        if (this.selecting) {
-          switch (e.detail.state) {
-            case 'track':
-              console.log('selecting');
-            break;
-            case 'end':
-              console.log('selection end');
-              this._setSelecting(false);
-          }
-        }
-      },
-
-      _touchSelectingHandler: function(selecting, _touching) {
-        if (selecting) {
-          if (_touching) {
-            this.toggleClass('touch-selecting', true, this.$.scrollThreshold);
-          } else {
-            this.toggleClass('touch-selecting', false, this.$.scrollThreshold);
-          }
-        }
+      _getSelectingClass: function(selecting) {
+        return selecting ? ' selecting': '';
       }
-
   });
   </script>
 </dom-module>

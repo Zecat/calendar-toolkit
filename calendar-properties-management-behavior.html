@@ -1,0 +1,74 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="moment-import.html">
+
+<script>
+  /**
+   * @demo demo/index.html
+   * @polymerBehavior Polymer.CalendarPropertiesManagementBehavior
+   */
+  Polymer.CalendarPropertiesManagementBehavior = {
+  	
+  	togglePropertyForDate: function(date, property, boolean) {
+      var date = moment(date);
+      this.generateMonthsUntil(date);
+      this._togglePropertyForDateFromIndexes(this.getMonthIndexForDate(date), date.format('D') - 1, property, boolean);
+    },
+
+    togglePropertyForInterval: function(startDate, endDate, property, boolean) {
+      var startDate = moment(startDate);
+      var endDate = moment(endDate);
+      // ensure months to select are generated
+      this.generateMonthsUntil(startDate);
+      this.generateMonthsUntil(endDate);
+      // order dates -> can be done usine moment.maximum & moment.minimum instead
+      if ( startDate.isAfter(endDate, 'day') ) {
+        var tmpDate = startDate;
+        startDate = endDate;
+        endDate = tmpDate;
+      }
+      var startDateMonthIndex = this.getMonthIndexForDate(startDate);
+      var endDateMonthIndex = this.getMonthIndexForDate(endDate);
+      var startDayIndex = parseInt(startDate.format('D')) -1;
+      var endDayIndex = parseInt(endDate.format('D'));
+
+      if (startDateMonthIndex == endDateMonthIndex) {
+        this._togglePropertyForDaysInMonthFromIndexes(startDayIndex, endDayIndex, startDateMonthIndex, property, boolean);
+      } else {
+        this._togglePropertyForDaysInMonthFromIndexes(startDayIndex, startDate.daysInMonth(), startDateMonthIndex, property, boolean);
+        this._togglePropertyForDaysInMonthFromIndexes(0, endDayIndex, endDateMonthIndex, property, boolean);
+        for (i = startDateMonthIndex + 1; i < endDateMonthIndex; i++) {
+          this._togglePropertyForMonthFromIndex(i, property, boolean);
+        }
+      }
+    },
+
+    togglePropertyForMonth: function(month, property, boolean) {
+      var month = moment(month);
+      this.generateMonthsUntil(month.startOf('month'));
+      this.generateMonthsUntil(month.endOf('month'));
+      this._togglePropertyForMonthFromIndex(this.getMonthIndexForDate(month), property, boolean);
+    },
+
+    togglePropertyFromModel: function(model, property, boolean) {
+      model.set('day.'+property, (boolean == undefined) ? !model.__data__.day[property] : boolean);
+    },
+
+    _togglePropertyForDaysInMonthFromIndexes: function(startDayIndex, endDayIndex, monthIndex, property, boolean) {
+      for(i = startDayIndex; i < endDayIndex; i++) {
+        this.set('_months.'+monthIndex+'.days.'+i+'.'+property,
+          (boolean == undefined) ? !this._months[monthIndex].days[i][property] : boolean);
+      }
+    },
+
+    _togglePropertyForMonthFromIndex: function(monthIndex, property, boolean) {
+      this._togglePropertyForDaysInMonthFromIndexes(0, this._months[monthIndex].days.length, monthIndex, property, boolean);
+    },
+
+    _togglePropertyForDateFromIndexes: function(monthIndex, dayIndex, property, boolean) {
+      this.set('_months.'+monthIndex+'.days.'+dayIndex+'.'+property,
+          (boolean == undefined) ? !this._months[monthIndex].days[dayIndex][property] : boolean);
+    }
+      
+  }
+
+</script>
