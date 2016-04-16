@@ -52,12 +52,6 @@
           type: Number,
           readOnly: true
         },
-        _months: {
-          type: Array,
-          value: function() {
-            return []
-          }
-        },
         _weekdays: {
           type: Array,
           readOnly: true
@@ -133,7 +127,7 @@
         if (this.maxMonth != undefined) {
           month = moment.min(month, moment(this.maxMonth));
         }
-        this._months = [ this._getMonth(month) ];
+        this.set('_months', [ this._getMonth(month) ] );
         this._set_firstLoadedMonthDate(month.startOf('month').toDate());
         this._set_lastLoadedMonthDate(month.startOf('month').toDate());
         this._set_unloadedLowerMonths(this.maxMonth ? moment(this.maxMonth).diff(month, 'month') : -1);
