@@ -7,6 +7,18 @@
    * @polymerBehavior Polymer.CalendarPropertiesManagementBehavior
    */
   Polymer.CalendarPropertiesManagementBehavior = {
+
+    /**
+     * Be aware of your behaviors import order and override this method with your own logic to ensure months are generated for the given date.
+     */
+    generateMonthsUntil: function(date) {
+
+    },
+
+    getMonthIndexForDate: function(date) {
+      var firstMonth = this._months[0];
+      return moment(date).diff(moment([firstMonth.year, firstMonth.month]), 'month');
+    },
   	
   	togglePropertyForDate: function(date, property, boolean) {
       var date = moment(date);
