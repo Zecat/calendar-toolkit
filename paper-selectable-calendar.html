@@ -13,8 +13,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="../paper-styles/color.html">
 <link rel="import" href="calendar-generation-behavior.html">
-<link rel="import" href="calendar-selectable-behavior.html">
+<link rel="import" href="calendar-multi-selectable-behavior.html">
 <link rel="import" href="paper-calendar-shared-styles.html">
+
 
 <!--
 An element providing a solution to no problem in particular.
@@ -82,8 +83,8 @@ Example:
       is: 'paper-selectable-calendar',
 
       behaviors: [
-        Polymer.CalendarGenerationBehavior,
-        Polymer.CalendarSelectableBehavior
+        Polymer.CalendarMultiSelectableBehavior,
+        Polymer.CalendarGenerationBehavior
       ],
 
       _getSelectedClass: function(selected) {

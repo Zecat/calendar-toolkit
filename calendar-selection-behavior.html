@@ -1,23 +1,28 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="moment-import.html">
-<link rel="import" href="calendar-properties-management-behavior.html">
 
 <script>
   /**
    * @demo demo/index.html
-   * @polymerBehavior Polymer.CalendarSelectableBehavior
+   * @polymerBehavior Polymer.CalendarSelectionBehavior
    */
-  Polymer.CalendarSelectableBehaviorImpl = {
+  Polymer.CalendarSelectionBehavior = {
   	
   	properties: {
       immediateStartDate: {
         type: Date,
-        computed: 'computeImmediateStartDate(_hoveredStartTimestamp, _hoveredTimestamp)',
         notify: true
       },
       immediateEndDate: {
         type: Date,
-        computed: 'computeImmediateEndDate(_hoveredStartTimestamp, _hoveredTimestamp)',
+        notify: true
+      },
+      lastStartDate: {
+        type: Date,
+        notify: true
+      },
+      lastEndDate: {
+        type: Date,
         notify: true
       },
       selecting: {
@@ -61,17 +66,12 @@
       _touchStartY: {
         type: Number,
         readOnly: true
-      },
-      _changedMonths: {
-        type: Array,
-        value: function() {
-          return []
-        }
       }
     },
 
     observers: [
-      '_touchSelectingHandler(selecting, _touching)'
+      '_touchSelectingHandler(selecting, _touching)',
+      '_hoveredIntervalChange(_hoveredStartTimestamp, _hoveredTimestamp)'
     ],
 
     _selectionDisabledChange: function(selectionDisabled) {
@@ -114,14 +114,16 @@
       }
     },
 
-    computeImmediateStartDate: function(_hoveredStartTimestamp, _hoveredTimestamp) {
-      console.log('start: '+moment(new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp))).format('L'));
-      return new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp));
-    },
+    _hoveredIntervalChange: function(_hoveredStartTimestamp, _hoveredTimestamp) {
+      var minDate = Math.min(_hoveredStartTimestamp, _hoveredTimestamp);
+      var maxDate = Math.max(_hoveredStartTimestamp, _hoveredTimestamp);
 
-    computeImmediateEndDate: function(_hoveredStartTimestamp, _hoveredTimestamp) {
-      console.log('end: '+moment(new Date(Math.max(_hoveredStartTimestamp, _hoveredTimestamp))).format('L'));
-      return new Date(Math.min(_hoveredStartTimestamp, _hoveredTimestamp));
+      if (!moment(minDate).isSame(this.immediateStartDate)) {
+        this.immediateStartDate = new Date(minDate);
+      }
+      if (!moment(maxDate).isSame(this.immediateEndDate)) {
+        this.immediateEndDate = new Date(maxDate);
+      }
     },
 
     _mouseupHandler: function() {
@@ -184,54 +186,20 @@
 
     _hoveredTimestampChange: function(_hoveredTimestamp, _previousHoveredTimestamp) {
       if (_hoveredTimestamp == undefined) {
-        return;
-      }
-      if (_previousHoveredTimestamp == undefined) {
-        this.togglePropertyForDate(_hoveredTimestamp, 'selected');
-        this.togglePropertyForDate(_hoveredTimestamp, 'selecting');
+        this.immediateStartDate = undefined;
+        this.immediateEndDate = undefined;
+      } else if (_previousHoveredTimestamp == undefined) {
         this._set_hoveredStartTimestamp(_hoveredTimestamp);
-      } else {
-        var startDate = moment(_previousHoveredTimestamp);
-        var endDate = moment(_hoveredTimestamp);
-
-        if (_previousHoveredTimestamp >= this._hoveredStartTimestamp
-          && _hoveredTimestamp > this._hoveredStartTimestamp) {
-          if (_hoveredTimestamp > _previousHoveredTimestamp) {
-            startDate.add(1, 'day');
-          } else {
-            endDate.add(1, 'day');
-          }
-        } else if (_previousHoveredTimestamp <= this._hoveredStartTimestamp
-          && _hoveredTimestamp < this._hoveredStartTimestamp) {
-          if (_hoveredTimestamp < _previousHoveredTimestamp) {
-            startDate.subtract(1, 'day');
-          } else {
-            endDate.subtract(1, 'day');
-          }
-        }
-         if ( (Math.min(_previousHoveredTimestamp,_hoveredTimestamp) < this._hoveredStartTimestamp
-           && Math.max(_hoveredTimestamp, _previousHoveredTimestamp) > this._hoveredStartTimestamp) 
-           || (this._hoveredStartTimestamp == _hoveredTimestamp)) {
-          this.togglePropertyForDate(this._hoveredStartTimestamp, 'selected');
-          this.togglePropertyForDate(this._hoveredStartTimestamp, 'selecting');
-        }
-        this.togglePropertyForInterval(startDate, endDate, 'selected');
-        this.togglePropertyForInterval(startDate, endDate, 'selecting');
       }
     },
 
     _selectingChange: function(selecting) {
       if (!selecting) {
-        this.togglePropertyForInterval(this._hoveredStartTimestamp, this._hoveredTimestamp, 'selecting', false);
+        this.lastStartDate = this.immediateStartDate;
+        this.lastEndDate = this.immediateEndDate;
         this._set_hoveredTarget(undefined);
       }
     },
-  };
-
-  /** @polymerBehavior */
-  Polymer.CalendarSelectableBehavior = [
-    Polymer.CalendarPropertiesManagementBehavior,
-    Polymer.CalendarSelectableBehaviorImpl
-  ];
+  }
 
 </script>
