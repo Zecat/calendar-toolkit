@@ -29,6 +29,10 @@
     togglePropertyForInterval: function(startDate, endDate, property, boolean) {
       var startDate = moment(startDate);
       var endDate = moment(endDate);
+      if (startDate.isSame(endDate)) {
+        this.togglePropertyForDate(startDate, property, boolean);
+        return;
+      }
       // ensure months to select are generated
       this.generateMonthsUntil(startDate);
       this.generateMonthsUntil(endDate);
