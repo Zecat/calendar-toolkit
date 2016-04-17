@@ -131,6 +131,10 @@
       this._setSelecting(false);
     },
 
+    _preventDefault: function(e) {
+      e.preventDefault();
+    },
+
     _shouldCancelTouch: function(e) {
       if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
         this._set_waitForTouchSelection(false);
@@ -174,9 +178,9 @@
     _touchSelectingHandler: function(selecting, _touching) {
       if (selecting) {
         if (_touching) {
-          this.toggleClass('touch-selecting', true);
+          this.listen(this, 'touchmove', '_preventDefault');
         } else {
-          this.toggleClass('touch-selecting', false);
+          this.unlisten(this, 'touchmove', '_preventDefault');
         }
       }
     },
