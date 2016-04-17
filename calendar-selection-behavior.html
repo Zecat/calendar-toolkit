@@ -66,6 +66,11 @@
       _touchStartY: {
         type: Number,
         readOnly: true
+      },
+      _waitForTouchSelection: {
+        type: Boolean,
+        vaue: false,
+        readOnly: true
       }
     },
 
@@ -93,19 +98,15 @@
       }
     },
 
-    _dayTapped: function(e) {
-      if (this._touching) {
-        this.togglePropertyFromModel(this._getModelFromDayTarget(e.target), 'selected');
-      }
-    },
-
     _downHandler: function(e) {
       if (this._touching && this.touchSelectionDelay) {
         this._set_touchStartY(e.detail.y);
+        this._set_waitForTouchSelection(true);
         this.listen(this, 'touchmove', '_shouldCancelTouch');
         this.async(function(){
           this.unlisten(this, 'touchmove', '_shouldCancelTouch');
-          if (this._touching) {
+          if (this._waitForTouchSelection) {
+            this._set_waitForTouchSelection(false);
             this._startSelection(e);
           }
         }, this.touchSelectionDelay);
@@ -132,7 +133,7 @@
 
     _shouldCancelTouch: function(e) {
       if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
-        this._set_touching(false);
+        this._set_waitForTouchSelection(false);
       }
     },
 
@@ -147,7 +148,11 @@
       this._set_touching(true);
     },
 
-    _touchEndHandler: function() {
+    _touchEndHandler: function(e) {
+      if (this._waitForTouchSelection) {
+        this._startSelection(e);
+        this._set_waitForTouchSelection(false);
+      }
       this._set_touching(false);
     },
 

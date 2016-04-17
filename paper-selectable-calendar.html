@@ -63,7 +63,7 @@ Example:
         <template>
           <div class="month">
             <div class="month-name">[[_getMonthName(month.month)]] [[month.year]]</div>
-            <div class="monthDays" on-tap="_dayTapped">
+            <div class="monthDays">
               <div style$="pointer-events: none; width: calc(14.285% * [[month.startWeekday]])"></div>
               <template is="dom-repeat" items="[[month.days]]" as="day">
                 <div class$="dayWrapper{{_getSelectedClass(day.selected)}}{{_getSelectingClass(day.selecting)}}">
