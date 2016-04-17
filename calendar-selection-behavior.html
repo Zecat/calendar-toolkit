@@ -9,28 +9,11 @@
   Polymer.CalendarSelectionBehavior = {
   	
   	properties: {
-      immediateStartDate: {
-        type: Date,
-        notify: true
-      },
-      immediateEndDate: {
-        type: Date,
-        notify: true
-      },
-      lastStartDate: {
-        type: Date,
-        notify: true
-      },
-      lastEndDate: {
-        type: Date,
-        notify: true
-      },
       selecting: {
         type: Boolean,
         value: false,
         notify: true,
-        readOnly: true,
-        observer: '_selectingChange'
+        readOnly: true
       },
       selectionDisabled : {
         type: Boolean,
@@ -51,8 +34,7 @@
       },
       _hoveredDate: {
         type: Number,
-        computed: '_getDateFromTarget(_hoveredTarget)',
-        observer: '_hoveredDateChange'
+        computed: '_getDateFromTarget(_hoveredTarget)'
       },
       _hoveredTarget: {
         type: Object,
@@ -75,8 +57,7 @@
     },
 
     observers: [
-      '_touchSelectingHandler(selecting, _touching)',
-      '_hoveredIntervalChange(_hoveredStartDate, _hoveredDate)'
+      '_touchSelectingHandler(selecting, _touching)'
     ],
 
     _selectionDisabledChange: function(selectionDisabled) {
@@ -112,20 +93,6 @@
         }, this.touchSelectionDelay);
       } else {
         this._startSelection(e);
-      }
-    },
-
-    _hoveredIntervalChange: function(_hoveredStartDate, _hoveredDate) {
-      var _hoveredStartMoment = moment(_hoveredStartDate);
-      var _hoveredMoment = moment(_hoveredDate);
-      var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
-      var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
-
-      if (!minDate.isSame(this.immediateStartDate)) {
-        this.immediateStartDate = minDate.toDate();
-      }
-      if (!maxDate.isSame(this.immediateEndDate)) {
-        this.immediateEndDate = maxDate.toDate();
       }
     },
 
@@ -193,24 +160,8 @@
 
     _getDateFromTarget: function(target) {
       return target ? new Date(this._getModelFromDayTarget(target).__data__.day.timestamp) : undefined;
-    },
+    }
 
-    _hoveredDateChange: function(_hoveredDate, _previousHoveredDate) {
-      if (_hoveredDate == undefined) {
-        this.immediateStartDate = undefined;
-        this.immediateEndDate = undefined;
-      } else if (_previousHoveredDate == undefined) {
-        this._set_hoveredStartDate(_hoveredDate);
-      }
-    },
-
-    _selectingChange: function(selecting) {
-      if (!selecting) {
-        this.lastStartDate = this.immediateStartDate;
-        this.lastEndDate = this.immediateEndDate;
-        this._set_hoveredTarget(undefined);
-      }
-    },
   }
 
 </script>

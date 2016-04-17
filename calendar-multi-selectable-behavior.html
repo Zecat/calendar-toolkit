@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="moment-import.html">
 <link rel="import" href="calendar-selection-behavior.html">
-<link rel="import" href="calendar-selection-behavior.html">
 <link rel="import" href="calendar-properties-management-behavior.html">
 
 <script>
@@ -21,16 +20,54 @@
         type: Date,
         observer: '_immediateEndDateChange',
         notify: true
-      }
+      },
+      lastStartDate: {
+        type: Date,
+        notify: true
+      },
+      lastEndDate: {
+        type: Date,
+        notify: true
+      },
+      selecting: {
+        observer: '_selectingChange'
+      },
+      _hoveredDate: {
+        observer: '_hoveredDateChange'
+      },
     },
 
     observers: [
-      '_shouldResetSelecting(selecting)'
+      '_shouldResetSelecting(selecting)',
+      '_hoveredIntervalChange(_hoveredStartDate, _hoveredDate)'
     ],
 
     _shouldResetSelecting: function(selecting) {
       if (!selecting && this.lastEndDate) {
         this.togglePropertyForInterval(this.lastStartDate, this.lastEndDate, 'selecting', false);
+      }
+    },
+
+    _hoveredDateChange: function(_hoveredDate, _previousHoveredDate) {
+      if (_hoveredDate == undefined) {
+        this.immediateStartDate = undefined;
+        this.immediateEndDate = undefined;
+      } else if (_previousHoveredDate == undefined) {
+        this._set_hoveredStartDate(_hoveredDate);
+      }
+    },
+
+    _hoveredIntervalChange: function(_hoveredStartDate, _hoveredDate) {
+      var _hoveredStartMoment = moment(_hoveredStartDate);
+      var _hoveredMoment = moment(_hoveredDate);
+      var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
+      var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
+
+      if (!minDate.isSame(this.immediateStartDate)) {
+        this.immediateStartDate = minDate.toDate();
+      }
+      if (!maxDate.isSame(this.immediateEndDate)) {
+        this.immediateEndDate = maxDate.toDate();
       }
     },
 
@@ -63,7 +100,15 @@
       }
       this.togglePropertyForInterval(newImmediateEndDate, previousImmediateEndDate, 'selected');
       this.togglePropertyForInterval(newImmediateEndDate, previousImmediateEndDate, 'selecting');
-    }
+    },
+
+    _selectingChange: function(selecting) {
+      if (!selecting) {
+        this.lastStartDate = this.immediateStartDate;
+        this.lastEndDate = this.immediateEndDate;
+        this._set_hoveredTarget(undefined);
+      }
+    },
 
   };
 
