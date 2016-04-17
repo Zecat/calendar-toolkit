@@ -84,13 +84,39 @@ Example:
         Polymer.CalendarGenerationBehavior
       ],
 
+      observers: [
+        '_touchSelectingHandler(selecting, touching)'
+      ],
+
       _getSelectedClass: function(selected) {
         return selected ? ' selected': '';
       },
 
       _getSelectingClass: function(selecting) {
         return selecting ? ' selecting': '';
+      },
+
+      _getDateFromTarget: function(target) {
+        return new Date(
+          Polymer.dom(Polymer.dom(target).parentNode).lastElementChild
+          .modelForElement(target).__data__.day.timestamp
+        );
+      },
+
+      _touchSelectingHandler: function(selecting, touching) {
+        if (selecting) {
+          if (touching) {
+            this.listen(this, 'touchmove', '_preventDefault');
+          } else {
+            this.unlisten(this, 'touchmove', '_preventDefault');
+          }
+        }
+      },
+
+      _preventDefault: function(e) {
+        e.preventDefault();
       }
+
   });
   </script>
 </dom-module>

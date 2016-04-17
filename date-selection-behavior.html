@@ -28,19 +28,23 @@
         type: Number,
         value: 10
       },
+      _dayClass: {
+        type: String,
+        value: 'dayWrapper'
+      },
       _hoveredStartDate: {
         type: Number,
         readOnly: true
       },
       _hoveredDate: {
         type: Number,
-        computed: '_getDateFromTarget(_hoveredTarget)'
+        computed: '_compute_hoveredDate(_hoveredTarget)'
       },
       _hoveredTarget: {
         type: Object,
         readOnly: true
       },
-      _touching: {
+      touching: {
         type: Boolean,
         value: false,
         readOnly: true
@@ -56,10 +60,6 @@
       }
     },
 
-    observers: [
-      '_touchSelectingHandler(selecting, _touching)'
-    ],
-
     _selectionDisabledChange: function(selectionDisabled) {
       if (!selectionDisabled) {
         this.listen(this, 'touchstart', '_touchStartHandler');
@@ -74,13 +74,13 @@
         this.unlisten(this, 'mouseup', '_mouseupHandler');
         this.unlisten(this, 'down', '_downHandler');
         this.unlisten(this, 'track', '_trackHandler');
-        this._set_touching(false);
+        this._setTouching(false);
         this._setSelecting(false);
       }
     },
 
     _downHandler: function(e) {
-      if (this._touching && this.touchSelectionDelay) {
+      if (this.touching && this.touchSelectionDelay) {
         this._set_touchStartY(e.detail.y);
         this._set_waitForTouchSelection(true);
         this.listen(this, 'touchmove', '_shouldCancelTouch');
@@ -100,10 +100,6 @@
       this._setSelecting(false);
     },
 
-    _preventDefault: function(e) {
-      e.preventDefault();
-    },
-
     _shouldCancelTouch: function(e) {
       if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
         this._set_waitForTouchSelection(false);
@@ -112,13 +108,13 @@
 
     _startSelection: function(e) {
       this._setSelecting(true);
-      if (e.target.classList.contains('dayWrapper')) {
+      if (e.target.classList.contains(this._dayClass)) {
         this._set_hoveredTarget(e.target);
       }
     },
 
     _touchStartHandler: function(e) {
-      this._set_touching(true);
+      this._setTouching(true);
     },
 
     _touchEndHandler: function(e) {
@@ -126,7 +122,7 @@
         this._startSelection(e);
         this._set_waitForTouchSelection(false);
       }
-      this._set_touching(false);
+      this._setTouching(false);
     },
 
     _trackHandler: function(e) {
@@ -134,7 +130,7 @@
         switch (e.detail.state) {
           case 'track':
             var hovered = e.detail.hover();
-            if (hovered && hovered.classList.contains('dayWrapper')) {
+            if (hovered && hovered.classList.contains(this._dayClass)) {
               this._set_hoveredTarget(hovered);
             }
           break;
@@ -144,22 +140,13 @@
       }
     },
 
-    _touchSelectingHandler: function(selecting, _touching) {
-      if (selecting) {
-        if (_touching) {
-          this.listen(this, 'touchmove', '_preventDefault');
-        } else {
-          this.unlisten(this, 'touchmove', '_preventDefault');
-        }
-      }
-    },
-
-    _getModelFromDayTarget: function(target) {
-      return Polymer.dom(Polymer.dom(target).parentNode).lastElementChild.modelForElement(target);
-    },
-
+    /* Override this method with your own logic and return a Date object from the given target. We have already check that the target is defined and contains the class given by "dayClass" attribute. */
     _getDateFromTarget: function(target) {
-      return target ? new Date(this._getModelFromDayTarget(target).__data__.day.timestamp) : undefined;
+      
+    },
+
+    _compute_hoveredDate: function(target) {
+      return target ? this._getDateFromTarget(target) : undefined;
     }
 
   }
