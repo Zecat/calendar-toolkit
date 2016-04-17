@@ -45,14 +45,14 @@
         type: Number,
         value: 10
       },
-      _hoveredStartTimestamp: {
+      _hoveredStartDate: {
         type: Number,
         readOnly: true
       },
-      _hoveredTimestamp: {
+      _hoveredDate: {
         type: Number,
-        computed: '_getTimestampFromTarget(_hoveredTarget)',
-        observer: '_hoveredTimestampChange'
+        computed: '_getDateFromTarget(_hoveredTarget)',
+        observer: '_hoveredDateChange'
       },
       _hoveredTarget: {
         type: Object,
@@ -76,7 +76,7 @@
 
     observers: [
       '_touchSelectingHandler(selecting, _touching)',
-      '_hoveredIntervalChange(_hoveredStartTimestamp, _hoveredTimestamp)'
+      '_hoveredIntervalChange(_hoveredStartDate, _hoveredDate)'
     ],
 
     _selectionDisabledChange: function(selectionDisabled) {
@@ -115,15 +115,17 @@
       }
     },
 
-    _hoveredIntervalChange: function(_hoveredStartTimestamp, _hoveredTimestamp) {
-      var minDate = Math.min(_hoveredStartTimestamp, _hoveredTimestamp);
-      var maxDate = Math.max(_hoveredStartTimestamp, _hoveredTimestamp);
+    _hoveredIntervalChange: function(_hoveredStartDate, _hoveredDate) {
+      var _hoveredStartMoment = moment(_hoveredStartDate);
+      var _hoveredMoment = moment(_hoveredDate);
+      var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
+      var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
 
-      if (!moment(minDate).isSame(this.immediateStartDate)) {
-        this.immediateStartDate = new Date(minDate);
+      if (!minDate.isSame(this.immediateStartDate)) {
+        this.immediateStartDate = minDate.toDate();
       }
-      if (!moment(maxDate).isSame(this.immediateEndDate)) {
-        this.immediateEndDate = new Date(maxDate);
+      if (!maxDate.isSame(this.immediateEndDate)) {
+        this.immediateEndDate = maxDate.toDate();
       }
     },
 
@@ -189,16 +191,16 @@
       return Polymer.dom(Polymer.dom(target).parentNode).lastElementChild.modelForElement(target);
     },
 
-    _getTimestampFromTarget: function(target) {
-      return target ? this._getModelFromDayTarget(target).__data__.day.timestamp : undefined;
+    _getDateFromTarget: function(target) {
+      return target ? new Date(this._getModelFromDayTarget(target).__data__.day.timestamp) : undefined;
     },
 
-    _hoveredTimestampChange: function(_hoveredTimestamp, _previousHoveredTimestamp) {
-      if (_hoveredTimestamp == undefined) {
+    _hoveredDateChange: function(_hoveredDate, _previousHoveredDate) {
+      if (_hoveredDate == undefined) {
         this.immediateStartDate = undefined;
         this.immediateEndDate = undefined;
-      } else if (_previousHoveredTimestamp == undefined) {
-        this._set_hoveredStartTimestamp(_hoveredTimestamp);
+      } else if (_previousHoveredDate == undefined) {
+        this._set_hoveredStartDate(_hoveredDate);
       }
     },
 
