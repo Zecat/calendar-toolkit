@@ -36,9 +36,9 @@
         type: Number,
         readOnly: true
       },
-      _hoveredDate: {
+      hoveredDate: {
         type: Number,
-        computed: '_compute_hoveredDate(_hoveredTarget)'
+        computed: '_computeHoveredDate(_hoveredTarget)'
       },
       _hoveredTarget: {
         type: Object,
@@ -145,7 +145,7 @@
       
     },
 
-    _compute_hoveredDate: function(target) {
+    _computeHoveredDate: function(target) {
       return target ? this._getDateFromTarget(target) : undefined;
     }
 

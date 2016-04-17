@@ -32,14 +32,14 @@
       selecting: {
         observer: '_selectingChange'
       },
-      _hoveredDate: {
-        observer: '_hoveredDateChange'
+      hoveredDate: {
+        observer: 'hoveredDateChange'
       },
     },
 
     observers: [
       '_shouldResetSelecting(selecting)',
-      '_hoveredIntervalChange(_hoveredStartDate, _hoveredDate)'
+      '_hoveredIntervalChange(_hoveredStartDate, hoveredDate)'
     ],
 
     _shouldResetSelecting: function(selecting) {
@@ -48,18 +48,18 @@
       }
     },
 
-    _hoveredDateChange: function(_hoveredDate, _previousHoveredDate) {
-      if (_hoveredDate == undefined) {
+    hoveredDateChange: function(hoveredDate, _previousHoveredDate) {
+      if (hoveredDate == undefined) {
         this.immediateStartDate = undefined;
         this.immediateEndDate = undefined;
       } else if (_previousHoveredDate == undefined) {
-        this._set_hoveredStartDate(_hoveredDate);
+        this._set_hoveredStartDate(hoveredDate);
       }
     },
 
-    _hoveredIntervalChange: function(_hoveredStartDate, _hoveredDate) {
+    _hoveredIntervalChange: function(_hoveredStartDate, hoveredDate) {
       var _hoveredStartMoment = moment(_hoveredStartDate);
-      var _hoveredMoment = moment(_hoveredDate);
+      var _hoveredMoment = moment(hoveredDate);
       var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
       var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
 
