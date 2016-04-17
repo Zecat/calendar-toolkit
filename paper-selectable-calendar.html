@@ -30,6 +30,9 @@ Example:
 <dom-module id="paper-selectable-calendar">
   <template>
     <style include="paper-calendar-shared-styles">
+      :host.touch-selecting #scrollThreshold{
+        overflow: hidden !important;
+      }
       .dayWrapper.selected {
         background: var(--paper-blue-50);
       }
@@ -106,8 +109,12 @@ Example:
       _touchSelectingHandler: function(selecting, touching) {
         if (selecting) {
           if (touching) {
+            // avoid scrolling when selecting
+            this.toggleClass('touch-selecting', true);
+            // disable "swipe to refresh" on mobile
             this.listen(this, 'touchmove', '_preventDefault');
           } else {
+            this.toggleClass('touch-selecting', false);
             this.unlisten(this, 'touchmove', '_preventDefault');
           }
         }
