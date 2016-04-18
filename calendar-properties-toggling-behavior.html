@@ -6,7 +6,7 @@
    * @demo demo/index.html
    * @polymerBehavior Polymer.CalendarPropertiesManagementBehavior
    */
-  Polymer.CalendarPropertiesManagementBehavior = {
+  Polymer.CalendarPropertiesTogglingBehavior = {
 
     properties: {
       _toggledIntervalStartDate: {
@@ -59,7 +59,6 @@
     },
 
     _absToggledIntervalEndDateChange: function(newValue, oldValue) {
-      console.log(newValue, oldValue);
       if (!newValue) {
         return;
       }

@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="moment-import.html">
 <link rel="import" href="date-selection-behavior.html">
-<link rel="import" href="calendar-properties-management-behavior.html">
+<link rel="import" href="calendar-properties-toggling-behavior.html">
 
 <script>
   /**
@@ -32,7 +32,7 @@
 
   /** @polymerBehavior */  
   Polymer.CalendarMultiSelectableBehavior = [
-    Polymer.CalendarPropertiesManagementBehavior,
+    Polymer.CalendarPropertiesTogglingBehavior,
     Polymer.DateSelectionBehavior,
     Polymer.CalendarMultiSelectableBehaviorImpl
   ];
