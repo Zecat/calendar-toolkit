@@ -13,7 +13,8 @@
         type: Boolean,
         value: false,
         notify: true,
-        readOnly: true
+        readOnly: true,
+        observer: '_shouldReset_hoveredTarget'
       },
       selectionDisabled : {
         type: Boolean,
@@ -32,13 +33,16 @@
         type: String,
         value: 'dayWrapper'
       },
+      //activeFromDate
       _hoveredStartDate: {
         type: Number,
         readOnly: true
       },
+      //activeDate
       hoveredDate: {
         type: Number,
-        computed: '_computeHoveredDate(_hoveredTarget)'
+        computed: '_computeHoveredDate(_hoveredTarget)',
+        observer: '_shouldUpdate_hoveredStartDate'
       },
       _hoveredTarget: {
         type: Object,
@@ -57,6 +61,12 @@
         type: Boolean,
         vaue: false,
         readOnly: true
+      }
+    },
+
+    _shouldReset_hoveredTarget: function(selecting) {
+      if (!selecting) {
+        this._set_hoveredTarget(undefined);
       }
     },
 
@@ -103,6 +113,12 @@
     _shouldCancelTouch: function(e) {
       if (Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchSelectionMaxYTremor) {
         this._set_waitForTouchSelection(false);
+      }
+    },
+
+    _shouldUpdate_hoveredStartDate: function(newHoveredDate, previousHoveredDate) {
+      if (previousHoveredDate == undefined || newHoveredDate == undefined) {
+        this._set_hoveredStartDate(newHoveredDate);
       }
     },
 

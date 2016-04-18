@@ -31,10 +31,7 @@
       },
       selecting: {
         observer: '_selectingChange'
-      },
-      hoveredDate: {
-        observer: 'hoveredDateChange'
-      },
+      }
     },
 
     observers: [
@@ -45,15 +42,6 @@
     _shouldResetSelecting: function(selecting) {
       if (!selecting && this.lastEndDate) {
         this.togglePropertyForInterval(this.lastStartDate, this.lastEndDate, 'selecting', false);
-      }
-    },
-
-    hoveredDateChange: function(hoveredDate, _previousHoveredDate) {
-      if (hoveredDate == undefined) {
-        this.immediateStartDate = undefined;
-        this.immediateEndDate = undefined;
-      } else if (_previousHoveredDate == undefined) {
-        this._set_hoveredStartDate(hoveredDate);
       }
     },
 
@@ -106,7 +94,8 @@
       if (!selecting) {
         this.lastStartDate = this.immediateStartDate;
         this.lastEndDate = this.immediateEndDate;
-        this._set_hoveredTarget(undefined);
+        this.immediateStartDate = undefined;
+        this.immediateEndDate = undefined;
       }
     },
 
