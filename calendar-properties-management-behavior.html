@@ -8,6 +8,77 @@
    */
   Polymer.CalendarPropertiesManagementBehavior = {
 
+    properties: {
+      _toggledIntervalStartDate: {
+        type: Date
+      },
+      _toggledIntervalEndDate: {
+        type: Date
+      },
+      _absToggledIntervalStartDate: {
+        type: Number,
+        observer: '_absToggledIntervalStartDateChange',
+        readOnly: true
+      },
+      _absToggledIntervalEndDate: {
+        type: Number,
+        observer: '_absToggledIntervalEndDateChange',
+        readOnly: true
+      },
+      _intervalToggledProperties: {
+        type: Array
+      }
+    },
+
+    observers: [
+      '_toggledIntervalChange(_toggledIntervalStartDate, _toggledIntervalEndDate)'
+    ],
+
+    _toggledIntervalChange: function(_toggledIntervalStartDate, _toggledIntervalEndDate) {
+        if (_toggledIntervalStartDate && _toggledIntervalEndDate) {
+          this._set_absToggledIntervalStartDate(Math.min(_toggledIntervalStartDate, _toggledIntervalEndDate));
+          this._set_absToggledIntervalEndDate(Math.max(_toggledIntervalStartDate, _toggledIntervalEndDate));
+        } else {
+          this._set_absToggledIntervalStartDate(null);
+          this._set_absToggledIntervalEndDate(null);
+        }
+    },
+
+    _absToggledIntervalStartDateChange: function(newValue, oldValue) {
+      if (!oldValue || !newValue) {
+        return;
+      }
+      if (newValue < oldValue) {
+        oldValue = moment(oldValue).subtract(1, 'day');
+      } else {
+        newValue = moment(newValue).subtract(1, 'day');
+      }
+      for (property of this._intervalToggledProperties) {
+        this.togglePropertyForInterval(newValue, oldValue, property);
+      }
+    },
+
+    _absToggledIntervalEndDateChange: function(newValue, oldValue) {
+      console.log(newValue, oldValue);
+      if (!newValue) {
+        return;
+      }
+      if (!oldValue) {
+        this.togglePropertyForDate(newValue, 'selected');
+        this.togglePropertyForDate(newValue, 'selecting');
+        return;
+      }
+      if (newValue > oldValue) {
+        oldValue = moment(oldValue).add(1, 'day');
+      } else {
+        newValue = moment(newValue).add(1, 'day');
+      }
+
+      for (property of this._intervalToggledProperties) {
+        this.togglePropertyForInterval(newValue, oldValue, property);
+      }
+    },
+
     /**
      * Be aware of your behaviors import order and override this method with your own logic to ensure months are generated for the given date.
      */

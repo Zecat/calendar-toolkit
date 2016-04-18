@@ -9,98 +9,24 @@
    * @polymerBehavior Polymer.CalendarMultiSelectableBehavior
    */
   Polymer.CalendarMultiSelectableBehaviorImpl = {
-  	
-  	properties: {
-      immediateStartDate: {
-        type: Date,
-        observer: '_immediateStartDateChange',
-        notify: true
-      },
-      immediateEndDate: {
-        type: Date,
-        observer: '_immediateEndDateChange',
-        notify: true
-      },
-      lastStartDate: {
-        type: Date,
-        notify: true
-      },
-      lastEndDate: {
-        type: Date,
-        notify: true
-      },
-      selecting: {
-        observer: '_selectingChange'
-      },
-      hoverDisabled: {
-        value: true
-      }
-    },
 
     observers: [
-      '_shouldResetSelecting(selecting)',
-      '_hoveredIntervalChange(activeFromDate, activeDate)'
+      '_hoveredIntervalChange(activeFromDate, activeDate)',
     ],
 
-    _shouldResetSelecting: function(selecting) {
-      if (!selecting && this.lastEndDate) {
-        this.togglePropertyForInterval(this.lastStartDate, this.lastEndDate, 'selecting', false);
-      }
+    ready: function() {
+      this._intervalToggledProperties = ['selected', 'selecting'];
+      this.hoverDisabled
     },
 
     _hoveredIntervalChange: function(activeFromDate, activeDate) {
-      var _hoveredStartMoment = moment(activeFromDate);
-      var _hoveredMoment = moment(activeDate);
-      var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
-      var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
-
-      if (!minDate.isSame(this.immediateStartDate)) {
-        this.immediateStartDate = minDate.toDate();
+      if (!activeDate && this._toggledIntervalEndDate && this._toggledIntervalStartDate) {
+        this.togglePropertyForInterval(
+          this._toggledIntervalStartDate, this._toggledIntervalEndDate, 'selecting', false);
       }
-      if (!maxDate.isSame(this.immediateEndDate)) {
-        this.immediateEndDate = maxDate.toDate();
-      }
-    },
-
-    _immediateStartDateChange: function(newImmediateStartDate, previousImmediateStartDate) {
-      if (!previousImmediateStartDate || !newImmediateStartDate) {
-        return;
-      }
-      if (newImmediateStartDate < previousImmediateStartDate) {
-        previousImmediateStartDate = moment(previousImmediateStartDate).subtract(1, 'day');
-      } else {
-        newImmediateStartDate = moment(newImmediateStartDate).subtract(1, 'day');
-      }
-      this.togglePropertyForInterval(newImmediateStartDate, previousImmediateStartDate, 'selected');
-      this.togglePropertyForInterval(newImmediateStartDate, previousImmediateStartDate, 'selecting');
-    },
-
-    _immediateEndDateChange: function(newImmediateEndDate, previousImmediateEndDate) {
-      if (!newImmediateEndDate) {
-        return;
-      }
-      if (!previousImmediateEndDate) {
-        this.togglePropertyForDate(newImmediateEndDate, 'selected');
-        this.togglePropertyForDate(newImmediateEndDate, 'selecting');
-        return;
-      }
-      if (newImmediateEndDate > previousImmediateEndDate) {
-        previousImmediateEndDate = moment(previousImmediateEndDate).add(1, 'day');
-      } else {
-        newImmediateEndDate = moment(newImmediateEndDate).add(1, 'day');
-      }
-      this.togglePropertyForInterval(newImmediateEndDate, previousImmediateEndDate, 'selected');
-      this.togglePropertyForInterval(newImmediateEndDate, previousImmediateEndDate, 'selecting');
-    },
-
-    _selectingChange: function(selecting) {
-      if (!selecting) {
-        this.lastStartDate = this.immediateStartDate;
-        this.lastEndDate = this.immediateEndDate;
-        this.immediateStartDate = undefined;
-        this.immediateEndDate = undefined;
-      }
-    },
+      this._toggledIntervalStartDate = activeFromDate;
+      this._toggledIntervalEndDate = activeDate;
+    }
 
   };
 
