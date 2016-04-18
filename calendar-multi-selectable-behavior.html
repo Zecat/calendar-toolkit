@@ -36,7 +36,7 @@
 
     observers: [
       '_shouldResetSelecting(selecting)',
-      '_hoveredIntervalChange(_hoveredStartDate, hoveredDate)'
+      '_hoveredIntervalChange(activeFromDate, activeDate)'
     ],
 
     _shouldResetSelecting: function(selecting) {
@@ -45,9 +45,9 @@
       }
     },
 
-    _hoveredIntervalChange: function(_hoveredStartDate, hoveredDate) {
-      var _hoveredStartMoment = moment(_hoveredStartDate);
-      var _hoveredMoment = moment(hoveredDate);
+    _hoveredIntervalChange: function(activeFromDate, activeDate) {
+      var _hoveredStartMoment = moment(activeFromDate);
+      var _hoveredMoment = moment(activeDate);
       var minDate = moment.min(_hoveredStartMoment, _hoveredMoment);
       var maxDate = moment.max(_hoveredStartMoment, _hoveredMoment);
 

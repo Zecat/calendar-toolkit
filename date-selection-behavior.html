@@ -14,7 +14,7 @@
         value: false,
         notify: true,
         readOnly: true,
-        observer: '_shouldReset_hoveredTarget'
+        observer: '_shouldReset_activeTarget'
       },
       selectionDisabled : {
         type: Boolean,
@@ -33,18 +33,16 @@
         type: String,
         value: 'dayWrapper'
       },
-      //activeFromDate
-      _hoveredStartDate: {
+      activeFromDate: {
         type: Number,
         readOnly: true
       },
-      //activeDate
-      hoveredDate: {
+      activeDate: {
         type: Number,
-        computed: '_computeHoveredDate(_hoveredTarget)',
-        observer: '_shouldUpdate_hoveredStartDate'
+        computed: '_computeDateFromTarget(_activeTarget)',
+        observer: '_shouldUpdateActiveFromDate'
       },
-      _hoveredTarget: {
+      _activeTarget: {
         type: Object,
         readOnly: true
       },
@@ -64,9 +62,9 @@
       }
     },
 
-    _shouldReset_hoveredTarget: function(selecting) {
+    _shouldReset_activeTarget: function(selecting) {
       if (!selecting) {
-        this._set_hoveredTarget(undefined);
+        this._set_activeTarget(undefined);
       }
     },
 
@@ -116,16 +114,16 @@
       }
     },
 
-    _shouldUpdate_hoveredStartDate: function(newHoveredDate, previousHoveredDate) {
-      if (previousHoveredDate == undefined || newHoveredDate == undefined) {
-        this._set_hoveredStartDate(newHoveredDate);
+    _shouldUpdateActiveFromDate: function(newActiveDate, previousActiveDate) {
+      if (previousActiveDate == undefined || newActiveDate == undefined) {
+        this._setActiveFromDate(newActiveDate);
       }
     },
 
     _startSelection: function(e) {
       this._setSelecting(true);
       if (e.target.classList.contains(this._dayClass)) {
-        this._set_hoveredTarget(e.target);
+        this._set_activeTarget(e.target);
       }
     },
 
@@ -146,8 +144,8 @@
         switch (e.detail.state) {
           case 'track':
             var hovered = e.detail.hover();
-            if (hovered && hovered.classList.contains(this._dayClass)) {
-              this._set_hoveredTarget(hovered);
+            if (hovered && hovered.classList.contains(this._dayClass) && hovered != this._activeTarget) {
+              this._set_activeTarget(hovered);
             }
           break;
           case 'end':
@@ -161,7 +159,7 @@
       
     },
 
-    _computeHoveredDate: function(target) {
+    _computeDateFromTarget: function(target) {
       return target ? this._getDateFromTarget(target) : undefined;
     }
 
