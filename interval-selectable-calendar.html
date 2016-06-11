@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-styles/color.html">
 <link rel="import" href="calendar-generation-behavior.html">
 <link rel="import" href="calendar-interval-selectable-behavior.html">
-<link rel="import" href="paper-calendar-shared-styles.html">
+<link rel="import" href="calendar-shared-styles.html">
 
 
 <!--
@@ -27,9 +27,9 @@ Example:
 @hero hero.svg
 -->
 
-<dom-module id="paper-interval-selectable-calendar">
+<dom-module id="interval-selectable-calendar">
   <template>
-    <style include="paper-calendar-shared-styles">
+    <style include="calendar-shared-styles">
       :host.touch-selecting #scrollThreshold{
         overflow: hidden !important;
       }
@@ -80,7 +80,7 @@ Example:
 
   <script>
     Polymer({
-      is: 'paper-interval-selectable-calendar',
+      is: 'interval-selectable-calendar',
 
       behaviors: [
         Polymer.CalendarIntervalSelectableBehavior,

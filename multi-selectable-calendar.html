@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-styles/color.html">
 <link rel="import" href="calendar-generation-behavior.html">
 <link rel="import" href="calendar-multi-selectable-behavior.html">
-<link rel="import" href="paper-calendar-shared-styles.html">
+<link rel="import" href="calendar-shared-styles.html">
 
 
 <!--
@@ -22,14 +22,14 @@ An element providing a solution to no problem in particular.
 
 Example:
 
-    <paper-selectable-calendar></paper-selectable-calendar>
+    <multi-selectable-calendar></multi-selectable-calendar>
 @demo demo/selectable.html
 @hero hero.svg
 -->
 
-<dom-module id="paper-selectable-calendar">
+<dom-module id="multi-selectable-calendar">
   <template>
-    <style include="paper-calendar-shared-styles">
+    <style include="calendar-shared-styles">
       :host.touch-selecting #scrollThreshold{
         overflow: hidden !important;
       }
@@ -80,7 +80,7 @@ Example:
 
   <script>
     Polymer({
-      is: 'paper-selectable-calendar',
+      is: 'multi-selectable-calendar',
 
       behaviors: [
         Polymer.CalendarMultiSelectableBehavior,

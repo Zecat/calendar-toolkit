@@ -12,28 +12,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="calendar-generation-behavior.html">
-<link rel="import" href="paper-calendar-shared-styles.html">
+<link rel="import" href="calendar-shared-styles.html">
 
 <!--
 An element providing a solution to no problem in particular.
 
 Example:
 
-    <paper-calendar></paper-calendar>
+    <iron-list-calendar></iron-list-calendar>
 
 Example:
 
-    <paper-calendar>
-      <h2>Hello paper-calendar</h2>
-    </paper-calendar>
+    <iron-list-calendar>
+      <h2>Hello iron-list-calendar</h2>
+    </iron-list-calendar>
 
 @demo demo/index.html
 @hero hero.svg
 -->
 
-<dom-module id="paper-calendar">
+<dom-module id="iron-list-calendar">
   <template>
-    <style include="paper-calendar-shared-styles">
+    <style include="calendar-shared-styles">
     </style>
      <div class="week">
       <template is="dom-repeat" items="[[_weekdays]]">
@@ -68,7 +68,7 @@ Example:
 
   <script>
     Polymer({
-      is: 'paper-calendar',
+      is: 'iron-list-calendar',
 
       behaviors: [
         Polymer.CalendarGenerationBehavior

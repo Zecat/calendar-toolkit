@@ -12,9 +12,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <title>paper-calendar Demo</title>
+    <title>iron-list-calendar Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link rel="import" href="../paper-calendar.html">
+    <link rel="import" href="../iron-list-calendar.html">
   </head>
   <body unresolved>
 
@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 0;
         background: #FFF2F2;
       }
-      paper-calendar {
+      iron-list-calendar {
         width: 350px;
         height: 100vh;
         margin: auto;
@@ -31,8 +31,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <template is="dom-bind" id="scope">
       <!-- in this example, min-month is invalid as month are indexed at 0 -->
-      <paper-calendar start-month="[[startMonth]]" min-month="[1787, 12]" max-month='{"year": 1793, "month": 0}'>
-      </paper-calendar>
+      <iron-list-calendar start-month="[[startMonth]]" min-month="[1787, 12]" max-month='{"year": 1793, "month": 0}'>
+      </iron-list-calendar>
     </template>
 
     <script>

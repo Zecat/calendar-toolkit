@@ -1,5 +1,5 @@
 {
-  "name": "paper-calendar",
+  "name": "calendar-toolkit",
   "version": "0.1",
   "authors": [
     "Zecat <jullienfelix@gmail.com>"
@@ -12,7 +12,7 @@
   ],
   "main": "paper-calendar.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/Zecat/paper-calendar",
+  "homepage": "https://github.com/Zecat/calendar-toolkit",
   "ignore": [
     "/.*",
     "/test/"
