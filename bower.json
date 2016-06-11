@@ -1,8 +1,8 @@
 {
   "name": "paper-calendar",
-  "version": "1.0.7",
+  "version": "0.1",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Zecat <jullienfelix@gmail.com>"
   ],
   "description": "An element providing a solution to no problem in particular.",
   "keywords": [
@@ -12,7 +12,7 @@
   ],
   "main": "paper-calendar.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/<USERNAME>/seed-element/",
+  "homepage": "https://github.com/Zecat/paper-calendar",
   "ignore": [
     "/.*",
     "/test/"

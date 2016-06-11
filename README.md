@@ -1,61 +1,11 @@
 # paper-calendar
 
-An element providing a starting point for your own reusable Polymer elements.
+The idyllic idea of this set of tools is to handle the complexity of generating a calendar, associate data to the dates and add selectable features (simple, interval or multiple discontinuous) to an existing calendar simply by extending behaviors.
 
+The code may sound very obscure as not documented and there's still a lot of work to do but give it a try!
 
-## Dependencies
-
-Element dependencies are managed via [Bower](http://bower.io/). You can
-install that via:
-
-    npm install -g bower
-
-Then, go ahead and download the element's dependencies:
-
-    bower install
-
-
-## Playing With Your Element
-
-If you wish to work on your element in isolation, we recommend that you use
-[Polyserve](https://github.com/PolymerLabs/polyserve) to keep your element's
-bower dependencies in line. You can install it via:
-
-    npm install -g polyserve
-
-And you can run it via:
-
-    polyserve
-
-Once running, you can preview your element at
-`http://localhost:8080/components/paper-calendar/`, where `paper-calendar` is the name of the directory containing it.
-
-
-## Testing Your Element
-
-Simply navigate to the `/test` directory of your element to run its tests. If
-you are using Polyserve: `http://localhost:8080/components/paper-calendar/test/`
-
-### web-component-tester
-
-The tests are compatible with [web-component-tester](https://github.com/Polymer/web-component-tester).
-Install it via:
-
-    npm install -g web-component-tester
-
-Then, you can run your tests on _all_ of your local browsers via:
-
-    wct
-
-#### WCT Tips
-
-`wct -l chrome` will only run tests in chrome.
-
-`wct -p` will keep the browsers alive after test runs (refresh to re-run).
-
-`wct test/some-file.html` will test only the files you specify.
-
-
-## Yeoman support
-
-If you'd like to use Yeoman to scaffold your element that's possible. The official [`generator-polymer`](https://github.com/yeoman/generator-polymer) generator has a [`seed`](https://github.com/yeoman/generator-polymer#seed) subgenerator.
+- `calendar-generation-behavior` handle the calendar generation.
+- `calendar-multi-selectable-behavior` allows multiple and discontinuous selection of dates in a theoretically infinit calendar.
+- `calendar-interval-selectable-behavior` allows the selection of one continuous interval.
+- `calendar-properties-toggling-behavior` helps to manipulate the boolean properties associated to the dates (as the selected state).
+- `date-selection-behavior` observes the user input (mouse or touch events) to know the dates he want to select. You'll need to override '_getDateFromTarget'.
